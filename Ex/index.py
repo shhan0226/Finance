@@ -15,7 +15,8 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 #%matplotlib inline
 
-import operator
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 indices = {
     'SPI@SPX' : 'S&P 500',
@@ -153,21 +154,63 @@ def SCompare(A, B):
     else:
         return B
 
-def ShowIndex_(df):
+
+def ShowIndex_(df_ratio):
     print("show... (Index)")
     plt.close('all')
     plt.figure(figsize=(10, 5))
-    S, = plt.plot(df['S&P500']/df['S&P500'].loc[dt.date(2006, 1, 3)]*100,label='S&P500')
-    K, = plt.plot(df['KOSPI200']/df['KOSPI200'].loc[dt.date(2006, 1, 3)]*100, label='KOSPI200')
+    #S, = plt.plot(df['S&P500']/df['S&P500'].loc[dt.date(2019, 1, 2)]*100,label='S&P500')
+    #K, = plt.plot(df['KOSPI200']/df['KOSPI200'].loc[dt.date(2019, 1, 2)]*100, label='KOSPI200')
+    S, = plt.plot(df_ratio['S&P500'],label='S&P500')
+    K, = plt.plot(df_ratio['KOSPI200'],label='KOSPI200')
     plt.legend(handles=[S, K], loc=0)
     plt.grid(True, color='0.7', linestyle=':', linewidth=1)
     plt.savefig('Index_'+start_d+'~'+end_d+'.png')
     plt.show()
 
+
+def ScatteredPlot_(df_ratio):
+    print("show... (Scatter)")
+    plt.close('all')
+    plt.scatter(df_ratio['S&P500'], df_ratio['KOSPI200'], marker='.')
+    plt.grid(True, color='0.7', linestyle=':', linewidth=1)
+    plt.savefig('Scatter_'+start_d+'~'+end_d+'.png')
+    plt.show()
+
+
+def LinearRegression_(df_ratio):
+    x = df_ratio['S&P500']
+    y = df_ratio['KOSPI200']
+
+    #1개 칼럼 np.array로 변환
+    independent_var = np.array(x).reshape(-1,1)
+    dependent_var = np.array(y).reshape(-1,1)
+
+    #Linear Regression
+    regr = LinearRegression()
+    regr.fit(independent_var, dependent_var)
+
+    result = {'Slope':regr.coef_[0,0], 'Intercept':regr.intercept_[0], 'R^2':regr.score(independent_var, dependent_var)}
+
+    print(result)
+
+    print("show... (LinearRegression)")
+    plt.close('all')
+    plt.figure(figsize=(10, 5))
+    plt.scatter(independent_var, dependent_var, marker='.', color='skyblue')
+    plt.plot(independent_var, regr.predict(independent_var), color='r', linewidth=3)
+    plt.grid(True, color='0.7', linestyle=':', linewidth=1)
+    plt.xlabel('S&P500')
+    plt.ylabel('KOSPI200')
+    plt.savefig('LinearRegresion_'+start_d+'~'+end_d+'.png')
+    plt.show()
+
+
+
 if __name__ == '__main__':
 
     start_d = '2006-1-3'
-    end_d = '2019-12-28'
+    end_d = '2017-12-27'
 
     index_cd = 'KPI200'
     historical_prices = dict()
@@ -202,9 +245,17 @@ if __name__ == '__main__':
 
     df.to_csv('Prices'+start_d+'~'+end_d+'.csv', mode='w')
 
+    df_ratio = df.loc[:date_format(start_d)] / df.loc[date_format(start_d)]*100
+#    print( df_r2019.head(3) )
 
     Show_(df)
 #    print(df.loc[dt.date(2019, 1, 2)])
-    ShowIndex_(df)
+
+#    ShowIndex_(df)
+    ShowIndex_(df_ratio)
+
+    ScatteredPlot_(df_ratio)
+
+    LinearRegression_(df_ratio)
 
 
