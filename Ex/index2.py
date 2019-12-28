@@ -15,7 +15,8 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 #%matplotlib inline
 
-import operator
+import numpy as np
+from sklearn.lin
 
 indices = {
     'SPI@SPX' : 'S&P 500',
@@ -153,20 +154,31 @@ def SCompare(A, B):
     else:
         return B
 
+
 def ShowIndex_(df):
     print("show... (Index)")
     plt.close('all')
     plt.figure(figsize=(10, 5))
-    S, = plt.plot(df['S&P500']/df['S&P500'].loc[dt.date(2006, 1, 3)]*100,label='S&P500')
-    K, = plt.plot(df['KOSPI200']/df['KOSPI200'].loc[dt.date(2006, 1, 3)]*100, label='KOSPI200')
+    S, = plt.plot(df['S&P500']/df['S&P500'].loc[dt.date(2019, 1, 2)]*100,label='S&P500')
+    K, = plt.plot(df['KOSPI200']/df['KOSPI200'].loc[dt.date(2019, 1, 2)]*100, label='KOSPI200')
     plt.legend(handles=[S, K], loc=0)
     plt.grid(True, color='0.7', linestyle=':', linewidth=1)
     plt.savefig('Index_'+start_d+'~'+end_d+'.png')
     plt.show()
 
+
+def scatteredPlot_(df):
+    print("show... (Index)")
+    plt.close('all')
+    plt.scatter(df_ratio_2019_now['S&P500'], df_ratio_2019_now['KOSPI200'], marker='.')
+    plt.grid(True, color='0.7', linestyle=':', linewidth=1)
+    plt.savefig('Scatter_'+start_d+'~'+end_d+'.png')
+    plt.show()
+
+
 if __name__ == '__main__':
 
-    start_d = '2006-1-3'
+    start_d = '2019-1-2'
     end_d = '2019-12-28'
 
     index_cd = 'KPI200'
@@ -203,8 +215,9 @@ if __name__ == '__main__':
     df.to_csv('Prices'+start_d+'~'+end_d+'.csv', mode='w')
 
 
-    Show_(df)
+#    Show_(df)
 #    print(df.loc[dt.date(2019, 1, 2)])
-    ShowIndex_(df)
+#    ShowIndex_(df)
+    scatteredPlot_(df)
 
 

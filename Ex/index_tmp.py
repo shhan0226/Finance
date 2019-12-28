@@ -130,14 +130,14 @@ def index_global(d, symbol, start_date='', end_date='', page=1):
     return (d)
 
 def Show_(df):
-    print("show... (Prices)")
+    print("show...")
     plt.close('all')
     plt.figure(figsize=(10, 5))
-    S, = plt.plot(df['S&P500'],label='S&P500')
-    K, = plt.plot(df['KOSPI200'], label='KOSPI200')
+    S, = plt.plot(df['S&P500'],marker='o', label='S&P500')
+    K, = plt.plot(df['KOSPI200'],marker='o', label='KOSPI200')
     plt.legend(handles=[S, K], loc=0)
     plt.grid(True, color='0.7', linestyle=':', linewidth=1)
-    plt.savefig('Prices_'+start_d+'~'+end_d+'.png')
+    plt.savefig('Index2_'+start_d+'~'+end_d+'.png')
     plt.show()
 
 
@@ -153,20 +153,10 @@ def SCompare(A, B):
     else:
         return B
 
-def ShowIndex_(df):
-    print("show... (Index)")
-    plt.close('all')
-    plt.figure(figsize=(10, 5))
-    S, = plt.plot(df['S&P500']/df['S&P500'].loc[dt.date(2006, 1, 3)]*100,label='S&P500')
-    K, = plt.plot(df['KOSPI200']/df['KOSPI200'].loc[dt.date(2006, 1, 3)]*100, label='KOSPI200')
-    plt.legend(handles=[S, K], loc=0)
-    plt.grid(True, color='0.7', linestyle=':', linewidth=1)
-    plt.savefig('Index_'+start_d+'~'+end_d+'.png')
-    plt.show()
 
 if __name__ == '__main__':
 
-    start_d = '2006-1-3'
+    start_d = '2018-1-1'
     end_d = '2019-12-28'
 
     index_cd = 'KPI200'
@@ -199,12 +189,7 @@ if __name__ == '__main__':
     df = df.fillna(method='ffill')
     if df.isnull().values.any():
         df = df.fillna(method='bfill')
-
-    df.to_csv('Prices'+start_d+'~'+end_d+'.csv', mode='w')
-
-
+    print('result...')
+    print(df)
+    df.to_csv('Index2_'+start_d+'~'+end_d+'.csv', mode='w')
     Show_(df)
-#    print(df.loc[dt.date(2019, 1, 2)])
-    ShowIndex_(df)
-
-
