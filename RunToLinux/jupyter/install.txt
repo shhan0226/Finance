@@ -1,0 +1,46 @@
+sudo apt install python-pip
+pip install requests
+pip install beautifulsoup4
+pip install pandas
+
+- http://www.numpy.org/ 파이썬 라이브러리 고성능 수치계산
+sudo pip install -U numpy
+
+- http://www.scipy.org/ 과학, 분석, 그리고 엔지니어링을 위한 과학(계산)적 컴퓨팅 영역의 여러 기본적인 작업
+sudo pip install -U scipy
+
+- 머신러닝 알고리즘 라이브러리
+sudo pip install -U scikit-learn
+
+- http://matplotlib.org/index.html/ 추가로 그래프를 그려주는 라이브러리를 설치했다.
+sudo pip install  matplotlib
+
+- 설치 확인
+$ python
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import numpy
+>>> import scipy
+>>> import matplotlib
+>>> import sklearn
+
+- 한글 글꼴 설치(나눔글꼴)
+sudo apt-get install fonts-nanum*
+fc-cache -fv
+
+- 만일 다른 ttf 폰트를 가져왔다면 다음과 같이 복사하고, fc-cache 명령으로 폰트 캐시 삭제
+sudo cp new_font.ttf /usr/share/fonts/
+sudo fc-cache -fv
+
+- 나눔 글꼴을 matplotlib 에 복사하고, matplotlib의 폰트 캐시를 삭제
+sudo cp /usr/share/fonts/truetype/nanum/Nanum* /usr/local/lib/python3.4/dist-packages/matplotlib/mpl-data/fonts/ttf/
+
+
+cf)
+%matplotlib inline 의 역할은 notebook을 실행한 브라우저에서 바로 그림을 볼 수 있게 해주는 것
+
+
+To register the converters:
+        >>> from pandas.plotting import register_matplotlib_converters
+        >>> register_matplotlib_converters()
+  warnings.warn(msg, FutureWarning)
+No handles with labels found to put in legend.
