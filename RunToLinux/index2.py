@@ -240,23 +240,24 @@ if __name__ == '__main__':
 
     tmp = {'S&P500':sp500, 'KOSPI200':kospi200}
     df = pd.DataFrame(tmp)
+    df.sort_index(axis=1, inplace=True)
     df = df.fillna(method='ffill')
     if df.isnull().values.any():
         df = df.fillna(method='bfill')
 
     df.to_csv('Prices'+start_d+'~'+end_d+'.csv', mode='w')
 
-    df_ratio = df.loc[:date_format(start_d)] / df.loc[date_format(start_d)]*100
+#    df_ratio = df.loc[:date_format(start_d)] / df.loc[date_format(start_d)]*100
 #    print( df_r2019.head(3) )
 
-    Show_(df)
+#    Show_(df)
 #    print(df.loc[dt.date(2019, 1, 2)])
 
 #    ShowIndex_(df)
-    ShowIndex_(df_ratio)
+#    ShowIndex_(df_ratio)
 
-    ScatteredPlot_(df_ratio)
+#    ScatteredPlot_(df_ratio)
 
-    LinearRegression_(df_ratio)
+#    LinearRegression_(df_ratio)
 
 

@@ -202,8 +202,8 @@ if __name__ == '__main__':
 
     k10_historical_prices = dict()
 
-    start_date = '2017-1-2'
-    end_date = '2017-12-31'
+    start_date = '2006-1-3'
+    end_date = '2019-12-27'
 
 
 
@@ -221,9 +221,6 @@ if __name__ == '__main__':
     k10_historical_price = k10_historical_price.fillna(method='ffill')
     if k10_historical_price.isnull().values.any():
         k10_historical_price = k10_historical_price.fillna(method='bfill')
-
-    #2018.5.4 samsung : Adjusted price        
-    k10_historical_price['005930'] = k10_historical_price['005930'] / 50  
     k10_historical_price.to_csv('k10_Prices'+start_date+'~'+end_date+'.csv', mode='w')
 
 

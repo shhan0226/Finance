@@ -210,7 +210,7 @@ def LinearRegression_(df_ratio):
 if __name__ == '__main__':
 
     start_d = '2006-1-3'
-    end_d = '2017-12-27'
+    end_d = '2019-12-27'
 
     index_cd = 'KPI200'
     historical_prices = dict()
