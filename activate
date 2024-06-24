@@ -1,1 +1,2 @@
 source python/bin/activate
+# pip freeze > requirement.txt
