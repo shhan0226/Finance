@@ -15,22 +15,22 @@ output_date = datetime.strptime(output_date_str, "%Y-%m-%d")
 start_date = output_date - timedelta(days=365)
 start_date_str = start_date.strftime("%Y-%m-%d")
 
-# SPY ETF 데이터 가져오기
+# 데이터 가져오기
 spy = yf.Ticker("SPY")
-spy_data = spy.history(start=start_date_str, interval="1d")
+stock_data = spy.history(start=start_date_str, interval="1d")
 
 # 데이터 확인
-if spy_data.empty:
+if stock_data.empty:
     raise ValueError("입력한 날짜 범위에 데이터가 없습니다. 날짜를 다시 확인하세요.")
 
 # 이동평균선 계산
-spy_data['5D_MA'] = spy_data['Close'].rolling(window=5).mean()
-spy_data['20D_MA'] = spy_data['Close'].rolling(window=20).mean()
-# spy_data['60D_MA'] = spy_data['Close'].rolling(window=50).mean()
-spy_data['120D_MA'] = spy_data['Close'].rolling(window=100).mean()
+stock_data['5D_MA'] = stock_data['Close'].rolling(window=5).mean()
+stock_data['20D_MA'] = stock_data['Close'].rolling(window=20).mean()
+# stock_data['60D_MA'] = stock_data['Close'].rolling(window=50).mean()
+stock_data['120D_MA'] = stock_data['Close'].rolling(window=120).mean()
 
 # 출력 날짜부터의 데이터만 선택
-spy_data_filtered = spy_data.loc[output_date_str:]
+stock_data_filtered = stock_data.loc[output_date_str:]
 
 # 매매 조건에 따른 매수/매도 지점 찾기
 buy_signals = []
@@ -40,8 +40,11 @@ initial_investment = 500
 cash = initial_investment
 shares = 0
 
-for i in range(len(spy_data_filtered)):
-    row = spy_data_filtered.iloc[i]
+# 매매 시점과 가격 저장
+trades = []
+
+for i in range(len(stock_data_filtered)):
+    row = stock_data_filtered.iloc[i]
     
     if row['20D_MA'] > row['120D_MA']:
         if row['5D_MA'] > row['20D_MA'] and (position is None or position == 'sell'):
@@ -49,38 +52,46 @@ for i in range(len(spy_data_filtered)):
             position = 'buy'
             shares = cash / row['Close']
             cash = 0
+            trades.append(('Buy', row.name, row['Close']))
         elif row['5D_MA'] < row['20D_MA'] and position == 'buy':
             sell_signals.append((row.name, row['Close']))
             position = 'sell'
             cash = shares * row['Close']
             shares = 0
+            trades.append(('Sell', row.name, row['Close']))
     elif row['120D_MA'] > row['20D_MA'] and position == 'buy':
         sell_signals.append((row.name, row['Close']))
         position = 'sell'
         cash = shares * row['Close']
         shares = 0
+        trades.append(('Sell', row.name, row['Close']))
 
 # 최종 수익률 계산
-final_value = cash + (shares * spy_data_filtered.iloc[-1]['Close'])
+final_value = cash + (shares * stock_data_filtered.iloc[-1]['Close'])
 profit_percentage = (final_value - initial_investment) / initial_investment * 100
 
-# 최종 수익률 출력
-print(f"초기 투자금: ${initial_investment:.2f}")
-print(f"최종 평가금: ${final_value:.2f}")
-print(f"수익률: {profit_percentage:.2f}%")
-
-
-
-
-
+# 개별 거래의 수익 및 손실 계산
+trade_results = []
+for i in range(1, len(trades), 2):
+    buy_trade = trades[i - 1]
+    sell_trade = trades[i]
+    if buy_trade[0] == 'Buy' and sell_trade[0] == 'Sell':
+        profit_loss = (sell_trade[2] - buy_trade[2]) * (initial_investment / buy_trade[2])
+        trade_results.append({
+            'Buy Date': buy_trade[1],
+            'Buy Price': buy_trade[2],
+            'Sell Date': sell_trade[1],
+            'Sell Price': sell_trade[2],
+            'Profit/Loss': profit_loss
+        })
 
 # 매매 지점 시각화
 plt.figure(figsize=(14, 7))
-plt.plot(spy_data_filtered['Close'], label='Close Price', color="yellow")
-plt.plot(spy_data_filtered['5D_MA'], label='5-Day MA', color='red')
-plt.plot(spy_data_filtered['20D_MA'], label='20-Day MA', color='blue')
-# plt.plot(spy_data_filtered['60D_MA'], label='60-Day MA')
-plt.plot(spy_data_filtered['120D_MA'], label='120-Day MA')
+plt.plot(stock_data_filtered['Close'], label='Close Price')
+plt.plot(stock_data_filtered['5D_MA'], label='5-Day MA', color='red')
+plt.plot(stock_data_filtered['20D_MA'], label='20-Day MA', color='blue')
+# plt.plot(stock_data_filtered['60D_MA'], label='60-Day MA')
+plt.plot(stock_data_filtered['120D_MA'], label='120-Day MA')
 plt.title(f'SPY ETF Price and Moving Averages from {output_date_str}')
 plt.xlabel('Date')
 plt.ylabel('Price (USD)')
@@ -99,16 +110,24 @@ print(f"매매 신호가 '{graph_filename}' 파일로 저장되었습니다.")
 
 # 표 형식으로 출력 (출력 날짜 기준 데이터), Dividends, Stock Splits, Capital Gains 제외
 columns_to_display = ['Open', 'High', 'Low', 'Close', 'Volume', '5D_MA', '20D_MA', '120D_MA']
-# print(spy_data_filtered[columns_to_display])
+print(stock_data_filtered[columns_to_display])
 
 # CSV 파일로 저장 (Dividends, Stock Splits 제외)
 csv_filename = 'spy_trading_signals_filtered.csv'
-spy_data_filtered[columns_to_display].to_csv(csv_filename)
+stock_data_filtered[columns_to_display].to_csv(csv_filename)
 print(f"매매 신호 데이터가 '{csv_filename}' 파일로 저장되었습니다.")
 
-# CSV 파일 읽기 및 표로 출력
-df = pd.read_csv(csv_filename, index_col=0)
-print("CSV 파일 내용을 표로 출력합니다:")
-print(df)
+# 최종 수익률 출력
+print(f"초기 투자금: ${initial_investment:.2f}")
+print(f"최종 평가금: ${final_value:.2f}")
+print(f"수익률: {profit_percentage:.2f}%")
 
+# 개별 거래 결과 출력
+trade_results_df = pd.DataFrame(trade_results)
+print("개별 거래 결과:")
+print(trade_results_df)
 
+# CSV 파일로 저장
+trade_results_filename = 'trade_results.csv'
+trade_results_df.to_csv(trade_results_filename, index=False)
+print(f"거래 결과가 '{trade_results_filename}' 파일로 저장되었습니다.")
