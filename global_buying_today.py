@@ -46,7 +46,7 @@ twenty_day_ma = latest_data['20D_MA']
 one_twenty_day_ma = latest_data['120D_MA']
 
 print(f"오늘 날짜: {output_date_str}")
-print(f"현재 SPY 가격: ${current_price:.2f}")
+print(f"현재 {info['longName']} 가격: ${current_price:.2f}")
 print(f"====================================")
 print(f"5일 이동평균: ${five_day_ma:.2f}")
 print(f"20일 이동평균: ${twenty_day_ma:.2f}")
