@@ -56,6 +56,7 @@ print(f"20일 이동평균: ${twenty_day_ma:.2f}")
 print(f"60일 이동평균: ${sixty_day_ma:.2f}")
 print(f"120일 이동평균: ${one_twenty_day_ma:.2f}")
 
+
 print(f"====================================")
 # 매매 조건 확인
 if (twenty_day_ma >= one_twenty_day_ma) and (sixty_day_ma >= one_twenty_day_ma):
@@ -66,14 +67,12 @@ if (twenty_day_ma >= one_twenty_day_ma) and (sixty_day_ma >= one_twenty_day_ma):
         action = "매도! (20일평균 < 60일평균)"
 else:
     print(f"<박스권 혹은 우하향!!> 20일 또는 60일이, 120일보다 낮음...")    
-    if latest_data < twenty_day_ma:
+    if current_price < twenty_day_ma:
         action = "매도! (종가가 20일평균선을 터치하면...)"
     elif twenty_day_ma >= one_twenty_day_ma:
         action = "매수! (20일평균선이 120일평균선을 돌파하면...)"
-
-print(f"매매 조치: {action}")    
-
-
-
+    else:
+        action = "매도!"
+print(f"매매 조치: {action}")
 
 

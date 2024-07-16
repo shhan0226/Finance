@@ -15,6 +15,8 @@ start_date_str = start_date.strftime("%Y-%m-%d")
 # NVDA, NVIDIA Corporation
 # AAPL, Apple Inc.
 # MSFT, Microsoft Corporation
+# TSM, Taiwan Semiconductor Manufacturing Company Limited
+
 
 # 주식 데이터 가져오기
 stock = yf.Ticker("NVDA")
